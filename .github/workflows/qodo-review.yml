@@ -33,3 +33,4 @@ jobs:
           PR_REVIEWER.REQUIRE_SECURITY_REVIEW: "true"
           OPENAI.API_BASE: "https://openrouter.ai/api/v1"
           OPENAI.MODEL: "openai/gpt-4o-mini"
+          PR_COMMANDS: "/review"
