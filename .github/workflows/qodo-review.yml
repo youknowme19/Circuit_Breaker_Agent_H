@@ -10,12 +10,9 @@ on:
       - 'backend/app/models/**'
       - 'backend/app/storage/**'
       - 'mcp/financial_server/**'
-  issue_comment:
-    types: [created]
 
 jobs:
   qodo-review:
-    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/')) }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -30,10 +27,10 @@ jobs:
       - name: Qodo PR Agent Security Review
         uses: qodo-ai/pr-agent@main
         env:
-          OPENAI_KEY: ${{ secrets.OPENAI_KEY || secrets.QODO_API_KEY || secrets.OPENAI_API_KEY }}
+          OPENAI__KEY: ${{ secrets.OPENAI_KEY || secrets.QODO_API_KEY || secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTION_CONFIG.AUTO_REVIEW: "true"
-          GITHUB_ACTION_CONFIG.AUTO_IMPROVE: "true"
-          PR_REVIEWER.REQUIRE_SECURITY_REVIEW: "true"
-          OPENAI.API_BASE: "https://openrouter.ai/api/v1"
-          OPENAI.MODEL: "openai/gpt-4o-mini"
+          GITHUB_ACTION_CONFIG__AUTO_REVIEW: "true"
+          GITHUB_ACTION_CONFIG__AUTO_IMPROVE: "true"
+          PR_REVIEWER__REQUIRE_SECURITY_REVIEW: "true"
+          OPENAI__API_BASE: "https://openrouter.ai/api/v1"
+          OPENAI__MODEL: "openai/gpt-4o-mini"
