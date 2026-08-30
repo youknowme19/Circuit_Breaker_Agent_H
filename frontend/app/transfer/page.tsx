@@ -2,23 +2,25 @@
 
 import { useState } from 'react';
 import SiteNav from '@/components/SiteNav';
-import { Send, Shield, CheckCircle, AlertTriangle, XCircle, ArrowRight, ExternalLink, Clock, Play } from 'lucide-react';
+import { Send, CheckCircle, XCircle, Clock, Play, ExternalLink } from 'lucide-react';
+import { api, ApiError } from '@/lib/api';
 
 export default function TransferPage() {
   const [network, setNetwork] = useState('Monad Testnet');
   const [fromAddress, setFromAddress] = useState('0xa7c965820d4933dBe9F71fE665A4D0adAE98aD06');
   const [toAddress, setToAddress] = useState('0x57d1Cf3D387de087Eda90a1cC81eAc608F7a8f55');
-  const [amount, setAmount] = useState('0.01');
+  const [amount, setAmount] = useState('1');
   const [asset, setAsset] = useState('MON');
   const [reason, setReason] = useState('Monad Testnet payment transfer');
 
-  
   const [submitting, setSubmitting] = useState(false);
   const [timeline, setTimeline] = useState<any[]>([]);
   const [result, setResult] = useState<any>(null);
 
   const handleRequestTransfer = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
+
     setSubmitting(true);
     setResult(null);
     setTimeline([
@@ -39,55 +41,53 @@ export default function TransferPage() {
         reason: reason
       };
 
-      const res = await fetch('http://localhost:8000/api/actions/propose', {
+      const data = await api<any>('/api/actions/propose', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ action: payload })
       });
 
-      if (!res.ok) {
-        throw new Error(`HTTP error ${res.status}`);
-      }
-
-      const data = await res.json();
       const dec = data.decision;
 
       if (dec === 'BLOCK') {
-        setTimeline((prev) => [
-          ...prev.slice(0, 1),
-          { title: 'Policy Engine Check', status: 'failed', detail: `BLOCKED: Policy violation (${data.violations?.[0]?.description || 'Limit exceeded'})` }
+        const violationMsg = data.violations?.[0]?.message || 'Limit exceeded';
+        setTimeline([
+          { title: 'Payment Intent Created', status: 'done', detail: `Transfer ${amount} ${asset} to ${toAddress.slice(0, 10)}...` },
+          { title: 'Policy Engine Check', status: 'failed', detail: `BLOCKED: Policy violation (${violationMsg})` }
         ]);
         setResult({ status: 'BLOCKED', data });
         return;
       }
 
-      setTimeline((prev) => [
-        ...prev.slice(0, 1),
+      setTimeline([
+        { title: 'Payment Intent Created', status: 'done', detail: `Transfer ${amount} ${asset} to ${toAddress.slice(0, 10)}...` },
         { title: 'Policy Engine Check', status: 'done', detail: `Decision: ${dec}` },
         { title: 'Issuing Cryptographic HMAC Token', status: 'running', detail: 'Signing canonical action hash...' }
       ]);
 
-      // Issue token & execute via API
-      const execRes = await fetch(`http://localhost:8000/api/actions/${actId}/execute`, {
+      // Extract authorization token string (e.g. "AUTH-0001")
+      const tokenId = typeof data.authorization_token === 'string'
+        ? data.authorization_token
+        : (data.authorization_token?.token_id || `TOKEN-${actId}`);
+
+      const execData = await api<any>(`/api/actions/${actId}/execute`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token_id: data.authorization_token?.token_id || `TOKEN-${actId}` })
+        body: JSON.stringify({ token_id: tokenId })
       });
 
-      const execData = await execRes.json();
-
-      setTimeline((prev) => [
-        ...prev.slice(0, 2),
-        { title: 'HMAC Authorization Token Issued', status: 'done', detail: `Token ID: ${data.authorization_token?.token_id || 'AUTH-OK'}` },
+      setTimeline([
+        { title: 'Payment Intent Created', status: 'done', detail: `Transfer ${amount} ${asset} to ${toAddress.slice(0, 10)}...` },
+        { title: 'Policy Engine Check', status: 'done', detail: `Decision: ${dec}` },
+        { title: 'HMAC Authorization Token Issued', status: 'done', detail: `Token ID: ${tokenId}` },
         { title: 'Atomic Execution Gate Broadcast', status: 'done', detail: execData.message || 'Transaction executed' }
       ]);
 
       setResult({ status: execData.success ? 'EXECUTED' : 'FAILED', execData });
     } catch (e: any) {
+      const errorMsg = e instanceof ApiError ? e.message : (e.message || 'API Connection Failed');
       setTimeline((prev) => [
-        ...prev,
-        { title: 'Execution Error', status: 'failed', detail: e.message || 'API Connection Failed' }
+        ...prev.map(item => item.status === 'running' ? { ...item, status: 'failed', detail: `FAILED: ${errorMsg}` } : item),
       ]);
+      setResult({ status: 'FAILED', errorMsg });
     } finally {
       setSubmitting(false);
     }

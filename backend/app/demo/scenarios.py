@@ -339,7 +339,13 @@ def run_attack(attack_id: str) -> Dict[str, Any]:
     }
     if attack_id not in mapping:
         raise ValueError(f"Unknown attack: {attack_id}")
-    return mapping[attack_id]()
+    
+    old_mode = settings.ENABLE_TESTNET_EXECUTION
+    try:
+        settings.ENABLE_TESTNET_EXECUTION = False
+        return mapping[attack_id]()
+    finally:
+        settings.ENABLE_TESTNET_EXECUTION = old_mode
 
 
 def run_full_demo(reset: bool = True) -> Dict[str, Any]:

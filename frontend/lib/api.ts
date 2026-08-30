@@ -11,11 +11,11 @@ export class ApiError extends Error {
 
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 20000);
+  const timer = setTimeout(() => controller.abort(), 15000);
   try {
     const res = await fetch(`${API_BASE}${path}`, {
       ...init,
-      signal: controller.signal,
+      signal: init?.signal || controller.signal,
       headers: {
         'Content-Type': 'application/json',
         ...(init?.headers || {}),
@@ -36,9 +36,9 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
   } catch (err) {
     if (err instanceof ApiError) throw err;
     if ((err as Error).name === 'AbortError') {
-      throw new ApiError('Request timed out. Is the backend running on port 8000?', 408);
+      throw new ApiError('Request timed out after 15 seconds. Circuit Breaker backend did not respond.', 408);
     }
-    throw new ApiError('Backend unreachable. Start uvicorn on port 8000.', 503);
+    throw new ApiError('Backend unreachable. Ensure FastAPI is running on http://localhost:8000.', 503);
   } finally {
     clearTimeout(timer);
   }

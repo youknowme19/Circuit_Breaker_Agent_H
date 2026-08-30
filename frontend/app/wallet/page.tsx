@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import SiteNav from '@/components/SiteNav';
 import { Wallet, ShieldCheck, Cpu, RefreshCw, ExternalLink, Key, CheckCircle, Wifi } from 'lucide-react';
 
+import { api } from '@/lib/api';
+
 export default function WalletPage() {
   const [loading, setLoading] = useState(false);
   const [wallet, setWallet] = useState<any>({
@@ -19,15 +21,12 @@ export default function WalletPage() {
   const fetchWallet = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/health');
-      if (res.ok) {
-        const data = await res.json();
-        setWallet((prev: any) => ({
-          ...prev,
-          mode: data.execution_mode || 'LIVE MONAD TESTNET',
-          network: data.testnet_execution_enabled ? 'Monad Testnet' : 'Safe Mock Network'
-        }));
-      }
+      const data = await api<any>('/api/health');
+      setWallet((prev: any) => ({
+        ...prev,
+        mode: data.execution_mode || 'LIVE MONAD TESTNET',
+        network: data.testnet_execution_enabled ? 'Monad Testnet' : 'Safe Mock Network'
+      }));
     } catch (e) {
       console.error(e);
     } finally {
