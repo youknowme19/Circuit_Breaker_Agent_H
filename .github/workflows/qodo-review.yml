@@ -28,16 +28,10 @@ jobs:
         uses: qodo-ai/pr-agent@main
         env:
           OPENAI_KEY: ${{ secrets.OPENAI_KEY || secrets.QODO_API_KEY || secrets.OPENAI_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_KEY || secrets.QODO_API_KEY || secrets.OPENAI_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENAI_KEY || secrets.QODO_API_KEY || secrets.OPENAI_API_KEY }}
-          OPENAI__KEY: ${{ secrets.OPENAI_KEY || secrets.QODO_API_KEY || secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CUSTOM_LLM_PROVIDER: "openrouter"
-          CONFIG__MODEL: "openrouter/inclusionai/ling-3.0-flash-fin:free"
-          CONFIG__FALLBACK_MODELS: "['openrouter/inclusionai/ling-3.0-flash-fin:free']"
-          GITHUB_ACTION_CONFIG__AUTO_REVIEW: "true"
-          GITHUB_ACTION_CONFIG__AUTO_IMPROVE: "true"
+          OPENAI__API_BASE: "https://openrouter.ai/api/v1"
+          CONFIG__MODEL: "openai/gpt-4o-mini"
+          CONFIG__FALLBACK_MODELS: "['openai/gpt-4o-mini']"
           GITHUB_ACTION_CONFIG__HANDLE_PUSH_TRIGGER: "true"
           GITHUB_ACTION_CONFIG__ENABLE_SYNCHRONIZE: "true"
-          PR_REVIEWER__REQUIRE_SECURITY_REVIEW: "true"
-          OPENAI__MODEL: "openrouter/inclusionai/ling-3.0-flash-fin:free"
