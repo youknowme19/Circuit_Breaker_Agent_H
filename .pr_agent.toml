@@ -1,6 +1,6 @@
 [config]
-model = "openrouter/inclusionai/ling-3.0-flash-fin:free"
-fallback_models = ["openrouter/inclusionai/ling-3.0-flash-fin:free"]
+model = "inclusionai/ling-3.0-flash-fin:free"
+fallback_models = ["inclusionai/ling-3.0-flash-fin:free"]
 
 [github_action_config]
 auto_review = true
@@ -11,7 +11,7 @@ handle_push_trigger = true
 
 [openai]
 api_base = "https://openrouter.ai/api/v1"
-model = "openrouter/inclusionai/ling-3.0-flash-fin:free"
+model = "inclusionai/ling-3.0-flash-fin:free"
 
 [pr_reviewer]
 require_security_review = true
