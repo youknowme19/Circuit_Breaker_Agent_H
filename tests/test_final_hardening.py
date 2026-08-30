@@ -158,4 +158,22 @@ def test_66_decision_binding_mismatch_rejection():
 
     ok, msg, _ = execution_gate.execute_authorized_action(action.action_id, token_mismatched.token_id)
     assert ok is False
+    assert "BLOCKED by policy engine" in msg or "decision state mismatch" in msg
+
+def test_67_token_null_safety_defensive_check():
+    action = StructuredFinancialAction(
+        action_id="ACT-HARDEN-005",
+        source_account="ACC-001",
+        destination_account="ACC-002",
+        amount=100.0,
+        currency="USD",
+        invoice_id="INV-HARDEN-005",
+        counterparty_id="CP-005",
+        reference="Null Token Safety"
+    )
+    repository.save_action(action)
+    
+    # Missing token ID lookup returns False cleanly without AttributeError
+    ok, msg, _ = execution_gate.execute_authorized_action(action.action_id, "NON-EXISTENT-TOKEN")
+    assert ok is False
     assert "EXECUTION_REFUSED" in msg

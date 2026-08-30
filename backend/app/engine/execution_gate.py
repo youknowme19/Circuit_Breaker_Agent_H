@@ -56,7 +56,7 @@ class ExecutionGate:
         if decision.decision not in ("ALLOW", "REVIEW"):
             return False, "EXECUTION_REFUSED: Unknown decision state — fail closed", None
 
-        if token.decision not in ("ALLOW", "APPROVED", "REVIEW"):
+        if not token or token.decision not in ("ALLOW", "APPROVED", "REVIEW"):
             emit("DECISION_MISMATCH", "Authorization token decision state mismatch [REJECTED_DECISION_MISMATCH]", action_id=action_id)
             return False, "EXECUTION_REFUSED: Authorization token decision state mismatch [REJECTED_DECISION_MISMATCH]", None
 
