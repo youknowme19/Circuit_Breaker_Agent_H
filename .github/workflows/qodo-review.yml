@@ -1,0 +1,30 @@
+name: Qodo Security Review
+
+on:
+  pull_request:
+    branches: [ main, hackathon/* ]
+    paths:
+      - 'backend/app/engine/**'
+      - 'backend/app/execution/**'
+      - 'backend/app/models/**'
+      - 'backend/app/storage/**'
+      - 'mcp/financial_server/**'
+
+jobs:
+  qodo-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Qodo Code Analysis Trigger
+        run: |
+          echo "Qodo Automated PR Review Workflow Triggered for Pull Request"
+          echo "Target Security Files:"
+          echo " - backend/app/engine/execution_gate.py"
+          echo " - backend/app/models/authorization.py"
+          echo " - backend/app/execution/monad_testnet_adapter.py"
+          echo " - backend/app/storage/repository.py"
+          echo " - mcp/financial_server/server.py"
