@@ -2,6 +2,7 @@ name: Qodo Security Review
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened]
     branches: [ main, hackathon/* ]
     paths:
       - 'backend/app/engine/**'
@@ -13,18 +14,25 @@ on:
 jobs:
   qodo-review:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Qodo Code Analysis Trigger
-        run: |
-          echo "Qodo Automated PR Review Workflow Triggered for Pull Request"
-          echo "Target Security Files:"
-          echo " - backend/app/engine/execution_gate.py"
-          echo " - backend/app/models/authorization.py"
-          echo " - backend/app/execution/monad_testnet_adapter.py"
-          echo " - backend/app/storage/repository.py"
-          echo " - mcp/financial_server/server.py"
+      - name: Qodo PR Agent Security Review
+        uses: qodo-ai/pr-agent@main
+        env:
+          OPENAI_KEY: ${{ secrets.OPENAI_KEY || secrets.QODO_API_KEY || secrets.OPENAI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENAI_KEY || secrets.QODO_API_KEY || secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI__API_BASE: "https://openrouter.ai/api/v1"
+          CONFIG__MODEL: "openai/gpt-4o-mini"
+          CONFIG__FALLBACK_MODELS: "['gpt-4o']"
+          CONFIG__CUSTOM_MODEL_MAX_TOKENS: "128000"
+          GITHUB_ACTION_CONFIG__HANDLE_PUSH_TRIGGER: "true"
+          GITHUB_ACTION_CONFIG__ENABLE_SYNCHRONIZE: "true"

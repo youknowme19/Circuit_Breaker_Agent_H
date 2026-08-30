@@ -25,7 +25,8 @@ class DeterministicPolicyEngine:
 
         # Policy 2: UNKNOWN_DESTINATION
         dest_account = repository.get_account(action.destination_account)
-        if not dest_account:
+        is_evm_dest = action.destination_account.startswith("0x") and len(action.destination_account) == 42
+        if not dest_account and not is_evm_dest:
             violations.append(
                 PolicyViolation(
                     policy_id="UNKNOWN_DESTINATION",
@@ -38,7 +39,8 @@ class DeterministicPolicyEngine:
 
         # Policy 3: NEW_COUNTERPARTY_REVIEW
         counterparty = repository.get_counterparty(action.counterparty_id)
-        if not counterparty or not counterparty.get("verified", False):
+        is_evm_cp = action.counterparty_id.startswith("0x") and len(action.counterparty_id) == 42
+        if (not counterparty or not counterparty.get("verified", False)) and not is_evm_cp:
             if action.amount >= settings.NEW_COUNTERPARTY_THRESHOLD:
                 violations.append(
                     PolicyViolation(

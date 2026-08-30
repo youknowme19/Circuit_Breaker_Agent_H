@@ -45,10 +45,20 @@ class ExecutionGate:
             emit("HASH_MISMATCH", "Action payload mutated post-authorization [REJECTED_MUTATED_PAYLOAD]", action_id=action_id)
             return False, "EXECUTION_REFUSED: Action payload mutated post-authorization (Hash Mismatch) [REJECTED_MUTATED_PAYLOAD]", None
 
-        # 7. Decision State Check
+        # 7. Decision State & Token Decision Binding Check
         decision = repository.get_decision(action_id)
         if not decision:
             return False, "EXECUTION_REFUSED: No authorization decision record found", None
+
+        if decision.decision == "BLOCK":
+            return False, "EXECUTION_REFUSED: Action was BLOCKED by policy engine", None
+
+        if decision.decision not in ("ALLOW", "REVIEW"):
+            return False, "EXECUTION_REFUSED: Unknown decision state — fail closed", None
+
+        if not token or token.decision not in ("ALLOW", "APPROVED", "REVIEW"):
+            emit("DECISION_MISMATCH", "Authorization token decision state mismatch [REJECTED_DECISION_MISMATCH]", action_id=action_id)
+            return False, "EXECUTION_REFUSED: Authorization token decision state mismatch [REJECTED_DECISION_MISMATCH]", None
 
         if decision.decision == "BLOCK":
             return False, "EXECUTION_REFUSED: Action was BLOCKED by policy engine", None

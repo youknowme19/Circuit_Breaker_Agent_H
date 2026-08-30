@@ -40,6 +40,7 @@ def helper_issue_token(action_id: str, decision: str, human_approval_id: str = N
     return tok
 
 def test_trueforge_live_workflow():
+    settings.ENABLE_TESTNET_EXECUTION = False
     print("========================================")
     print("TRUEFORGE LIVE WORKFLOW VERIFICATION")
     print("========================================")
@@ -91,7 +92,7 @@ def test_trueforge_live_workflow():
         "agent_id": "trueforge-financial-operator",
         "source_account": "ACC-001",
         "destination_account": "ACC-002",
-        "counterparty_id": "VENDOR-777",
+        "counterparty_id": "VENDOR-991",
         "amount": 1500.0,
         "currency": "USD",
         "reason": "New counterparty transfer"

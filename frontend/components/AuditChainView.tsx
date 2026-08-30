@@ -25,9 +25,14 @@ export default function AuditChainView({ events, onVerify, onTamperSimulate }: P
 
   const handleVerify = async () => {
     setIsVerifying(true);
-    const res = await onVerify();
-    setVerificationResult(res);
-    setIsVerifying(false);
+    try {
+      const res = await onVerify();
+      setVerificationResult(res);
+    } catch (e: any) {
+      setVerificationResult({ valid: false, reason: e.message || 'Verification failed' });
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   return (

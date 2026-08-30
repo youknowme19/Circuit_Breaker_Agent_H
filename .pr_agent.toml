@@ -1,0 +1,18 @@
+[config]
+model = "openai/gpt-4o-mini"
+fallback_models = ["gpt-4o"]
+custom_model_max_tokens = 128000
+
+[github_action_config]
+auto_review = true
+auto_describe = true
+auto_improve = true
+enable_synchronize = true
+handle_push_trigger = true
+
+[openai]
+api_base = "https://openrouter.ai/api/v1"
+model = "openai/gpt-4o-mini"
+
+[pr_reviewer]
+require_security_review = true

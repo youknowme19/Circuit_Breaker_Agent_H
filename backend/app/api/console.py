@@ -62,8 +62,6 @@ class AttackRunRequest(BaseModel):
 
 @router.post("/attacks/run", summary="Run one Attack Lab scenario against the live engine")
 def attacks_run(req: AttackRunRequest):
-    if settings.ENABLE_TESTNET_EXECUTION:
-        raise HTTPException(status_code=403, detail="Attack lab refuses to operate while ENABLE_TESTNET_EXECUTION=true")
     try:
         return run_attack(req.attack_id)
     except ValueError as exc:

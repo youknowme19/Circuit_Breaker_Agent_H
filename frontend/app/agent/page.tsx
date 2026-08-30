@@ -5,7 +5,7 @@ import SiteNav from '@/components/SiteNav';
 import { Bot, User, Shield, CheckCircle, AlertOctagon, Terminal, ExternalLink, ArrowRight, Lock, Key, Server, Cpu } from 'lucide-react';
 
 export default function AgentPage() {
-  const [inputPrompt, setInputPrompt] = useState('Send 0.01 MON to 0xa7c965820d4933dBe9F71fE665A4D0adAE98aD06');
+  const [inputPrompt, setInputPrompt] = useState('Send 1 MON to 0xa7c965820d4933dBe9F71fE665A4D0adAE98aD06');
   const [pipelineState, setPipelineState] = useState<'IDLE' | 'RUNNING' | 'COMPLETE'>('COMPLETE');
 
   const [messages] = useState<any[]>([

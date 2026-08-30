@@ -4,12 +4,15 @@ import { useState } from 'react';
 import SiteNav from '@/components/SiteNav';
 import { Play, CheckCircle, ShieldAlert, XCircle, RefreshCw, ExternalLink } from 'lucide-react';
 
+import { api, ApiError } from '@/lib/api';
+
 export default function DemoPage() {
   const [running, setRunning] = useState(false);
   const [logs, setLogs] = useState<any[]>([]);
   const [finalStatus, setFinalStatus] = useState<string | null>(null);
 
   const runDemo = async () => {
+    if (running) return;
     setRunning(true);
     setLogs([]);
     setFinalStatus(null);
@@ -19,18 +22,13 @@ export default function DemoPage() {
     };
 
     try {
-      // 1. Safe Transfer
       appendLog('01. Safe Payment Transfer', 'RUNNING', 'Evaluating policy & issuing HMAC token...');
-      const res1 = await fetch('http://localhost:8000/api/demo/run-scenarios', { method: 'POST' });
-      if (res1.ok) {
-        const data = await res1.json();
-        setLogs(data.scenarios || []);
-        setFinalStatus(data.status || 'PASS');
-      } else {
-        appendLog('Demo Execution', 'FAILED', 'API returned error');
-      }
+      const data = await api<any>('/api/demo/run-scenarios', { method: 'POST' });
+      setLogs(data.scenarios || []);
+      setFinalStatus(data.status || 'PASS');
     } catch (e: any) {
-      appendLog('Demo Execution', 'FAILED', e.message || 'API connection failed');
+      const errorMsg = e instanceof ApiError ? e.message : (e.message || 'API connection failed');
+      appendLog('Demo Execution', 'FAILED', errorMsg);
     } finally {
       setRunning(false);
     }
