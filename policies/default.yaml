@@ -1,0 +1,41 @@
+# Circuit Breaker Default Policy Configuration
+
+policies:
+  - id: MAX_TRANSFER
+    enabled: true
+    severity: BLOCK
+    description: Maximum single transfer limit per transaction
+    parameters:
+      max_amount: 10000.00
+      currency: USD
+
+  - id: DAILY_TRANSFER_LIMIT
+    enabled: true
+    severity: BLOCK
+    description: Cumulative 24-hour account velocity transfer ceiling
+    parameters:
+      max_daily_amount: 20000.00
+      window_hours: 24
+      currency: USD
+
+  - id: DUPLICATE_PAYMENT
+    enabled: true
+    severity: BLOCK
+    description: Detect duplicate payment attempts within time window
+    parameters:
+      window_minutes: 15
+
+  - id: NEW_COUNTERPARTY_REVIEW
+    enabled: true
+    severity: REVIEW
+    description: Force human review for transfers to unverified counterparties above threshold
+    parameters:
+      threshold_amount: 1000.00
+      currency: USD
+
+  - id: UNKNOWN_DESTINATION
+    enabled: true
+    severity: BLOCK
+    description: Block execution if destination account is unverified or unknown
+    parameters:
+      strict_registry_check: true

@@ -1,0 +1,43 @@
+# macOS metadata files
+._*
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Database & Logs
+*.sqlite
+*.sqlite3
+*.db
+*.log
+.coverage
+htmlcov/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+build/
+dist/
+.cache/
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
