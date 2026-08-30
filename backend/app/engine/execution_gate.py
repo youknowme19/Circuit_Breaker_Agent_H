@@ -31,18 +31,19 @@ class ExecutionGate:
 
         # 4. Cryptographic Signature verification
         if not token.verify_signature(settings.SECRET_KEY):
-            emit("TOKEN_REJECTED", "Signature mismatch", action_id=action_id)
-            return False, "EXECUTION_REFUSED: Authorization token signature verification failed", None
+            emit("TOKEN_REJECTED", "Signature mismatch [REJECTED_FORGED_SIGNATURE]", action_id=action_id)
+            return False, "EXECUTION_REFUSED: Authorization token signature verification failed [REJECTED_FORGED_SIGNATURE]", None
 
         # 5. TTL Expiry check
         if token.is_expired():
-            return False, "EXECUTION_REFUSED: Authorization token TTL has expired", None
+            emit("TOKEN_EXPIRED", "TTL expired [REJECTED_EXPIRED_TOKEN]", action_id=action_id)
+            return False, "EXECUTION_REFUSED: Authorization token TTL has expired [REJECTED_EXPIRED_TOKEN]", None
 
         # 6. Action Hash Mismatch Check (Detects payload mutation post-authorization)
         current_action_hash = action.compute_hash()
         if current_action_hash != token.action_hash:
-            emit("HASH_MISMATCH", "Action payload mutated post-authorization", action_id=action_id)
-            return False, "EXECUTION_REFUSED: Action payload mutated post-authorization (Hash Mismatch)", None
+            emit("HASH_MISMATCH", "Action payload mutated post-authorization [REJECTED_MUTATED_PAYLOAD]", action_id=action_id)
+            return False, "EXECUTION_REFUSED: Action payload mutated post-authorization (Hash Mismatch) [REJECTED_MUTATED_PAYLOAD]", None
 
         # 7. Decision State Check
         decision = repository.get_decision(action_id)
@@ -69,7 +70,9 @@ class ExecutionGate:
         )
         if not reserved_ok:
             if "already been executed" in reserve_msg or "consumed" in reserve_msg.lower():
-                emit("REPLAY_REJECTED", reserve_msg, action_id=action_id)
+                emit("REPLAY_REJECTED", f"{reserve_msg} [REJECTED_CONSUMED_TOKEN]", action_id=action_id)
+                if "[REJECTED_CONSUMED_TOKEN]" not in reserve_msg:
+                    reserve_msg = f"{reserve_msg} [REJECTED_CONSUMED_TOKEN]"
             return False, reserve_msg, None
 
         emit("EXECUTION_RESERVED", f"Reserved {action_id}", action_id=action_id, token_id=token.token_id)

@@ -1,6 +1,6 @@
 # Qodo Security & Architecture Review Workflow
 
-> **Repository PR Review Target:** [`https://github.com/youknowme19/Circuit_Breaker_Agent_H/pull/new/hackathon/final-hardening`](https://github.com/youknowme19/Circuit_Breaker_Agent_H/pull/new/hackathon/final-hardening)
+> **Repository PR Review Target:** [`https://github.com/youknowme19/Circuit_Breaker_Agent_H/pull/new/security/final-execution-hardening`](https://github.com/youknowme19/Circuit_Breaker_Agent_H/pull/new/security/final-execution-hardening)
 
 This document outlines the security-critical files and pull request review workflow configured for automated review by **Qodo** (Qodo Merge / Qodo Gen / Qodo Cover).
 
@@ -11,7 +11,7 @@ This document outlines the security-critical files and pull request review workf
 ### 1. Execution Gate & Atomic Reservation
 - **File:** [`backend/app/engine/execution_gate.py`](file:///Volumes/SSD/circuit_breaker/backend/app/engine/execution_gate.py)
 - **Key Invariant:** Ensures an authorization token can be executed at most once. Enforces atomic reservation under repository lock prior to calling payment adapters.
-- **Review Focus:** Replay protection, double-spend prevention under concurrency, fail-closed handling on adapter exceptions.
+- **Review Focus:** Replay protection, double-spend prevention under concurrency, fail-closed handling on adapter exceptions, deterministic error code tags (`[REJECTED_FORGED_SIGNATURE]`, `[REJECTED_EXPIRED_TOKEN]`, `[REJECTED_MUTATED_PAYLOAD]`, `[REJECTED_CONSUMED_TOKEN]`).
 
 ### 2. Cryptographic HMAC Authorization Tokens
 - **File:** [`backend/app/models/authorization.py`](file:///Volumes/SSD/circuit_breaker/backend/app/models/authorization.py)
@@ -26,21 +26,11 @@ This document outlines the security-critical files and pull request review workf
 - **Key Invariant:** Private key (`TESTNET_PRIVATE_KEY`) is read strictly within backend execution adapters and is never returned over MCP tools or HTTP responses. If RPC is unreachable or credentials missing, fails closed without synthetic hashes.
 - **Review Focus:** Credential leakage prevention, raw transaction signing, Monad Explorer URL generation.
 
-### 4. Thread-Safe State Repository
-- **File:** [`backend/app/storage/repository.py`](file:///Volumes/SSD/circuit_breaker/backend/app/storage/repository.py)
-- **Key Invariant:** Thread-safe singleton utilizing `threading.Lock` to guarantee atomic state transitions (`ISSUED → RESERVED → CONSUMED`).
-- **Review Focus:** Lock granularity, race condition resistance under high concurrency.
-
-### 5. MCP Tool Surface & Boundary
-- **File:** [`mcp/financial_server/server.py`](file:///Volumes/SSD/circuit_breaker/mcp/financial_server/server.py)
-- **Key Invariant:** Exposes 19 financial tools (`get_wallet_balance`, `estimate_transfer`, `request_transfer`, etc.) without exposing execution authority. `execute_payment` requires a valid Circuit Breaker authorization token.
-- **Review Focus:** Interface separation, LLM authorization bypass defense.
-
 ---
 
 ## Automated Verification Suite
 
-The repository is validated by a 62-scenario pytest suite:
+The repository is validated by a 65-scenario pytest suite:
 
 ```bash
 PYTHONPATH=. ./venv/bin/python -m pytest -v
