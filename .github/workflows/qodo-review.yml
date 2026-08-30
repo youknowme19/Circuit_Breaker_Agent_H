@@ -29,4 +29,5 @@ jobs:
         env:
           OPENAI_KEY: ${{ secrets.OPENAI_KEY || secrets.QODO_API_KEY || secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTION_CONFIG.AUTO_REVIEW: "true"
           PR_REVIEWER.REQUIRE_SECURITY_REVIEW: "true"
