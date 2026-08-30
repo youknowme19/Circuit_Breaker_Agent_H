@@ -61,3 +61,15 @@ def redact_token(token: Optional[Any]) -> Optional[Dict[str, Any]]:
     if "signature" in data and data["signature"]:
         data["signature"] = "[redacted]"
     return data
+
+
+def emit_agent_trace(stage: str, agent_id: str, action_id: str, detail: str) -> Dict[str, Any]:
+    """Emit a redacted TrueForge agent execution trace event."""
+    return emit(
+        event_type="TRUEFORGE_AGENT_TRACE",
+        message=f"[{stage}] Agent {agent_id} -> Action {action_id}: {detail}",
+        stage=stage,
+        agent_id=agent_id,
+        action_id=action_id,
+    )
+
