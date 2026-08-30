@@ -1,0 +1,10 @@
+name: Circuit Breaker Financial Operator
+purpose: Testnet-only financial operations agent whose actions are strictly governed by Circuit Breaker.
+mcp_server: circuit-breaker-finance
+skill: trueforge/skills/financial-agent/SKILL.md
+sandbox: true
+human_checkpoints: true
+notes: >
+  TrueForge orchestrates tools and session state. Circuit Breaker authorizes.
+  execute_payment is not an authorization bypass and requires a Circuit Breaker token.
+  The agent NEVER has access to private keys.
