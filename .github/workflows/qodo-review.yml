@@ -2,6 +2,7 @@ name: Qodo Security Review
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened]
     branches: [ main, hackathon/* ]
     paths:
       - 'backend/app/engine/**'
@@ -13,18 +14,19 @@ on:
 jobs:
   qodo-review:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Qodo Code Analysis Trigger
-        run: |
-          echo "Qodo Automated PR Review Workflow Triggered for Pull Request"
-          echo "Target Security Files:"
-          echo " - backend/app/engine/execution_gate.py"
-          echo " - backend/app/models/authorization.py"
-          echo " - backend/app/execution/monad_testnet_adapter.py"
-          echo " - backend/app/storage/repository.py"
-          echo " - mcp/financial_server/server.py"
+      - name: Qodo PR Agent Security Review
+        uses: Codium-ai/pr-agent-action@v0.26
+        env:
+          OPENAI_KEY: ${{ secrets.OPENAI_KEY || secrets.QODO_API_KEY || secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_REVIEWER.REQUIRE_SECURITY_REVIEW: "true"
