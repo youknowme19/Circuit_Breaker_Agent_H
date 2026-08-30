@@ -29,8 +29,6 @@ jobs:
         env:
           OPENAI__KEY: ${{ secrets.OPENAI_KEY || secrets.QODO_API_KEY || secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTION_CONFIG__AUTO_REVIEW: "true"
-          GITHUB_ACTION_CONFIG__AUTO_IMPROVE: "true"
-          PR_REVIEWER__REQUIRE_SECURITY_REVIEW: "true"
+          PR_ACTION: "review"
           OPENAI__API_BASE: "https://openrouter.ai/api/v1"
           OPENAI__MODEL: "openai/gpt-4o-mini"
