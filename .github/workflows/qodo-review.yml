@@ -25,7 +25,7 @@ jobs:
           fetch-depth: 0
 
       - name: Qodo PR Agent Security Review
-        uses: Codium-ai/pr-agent-action@v0.26
+        uses: qodo-ai/pr-agent@main
         env:
           OPENAI_KEY: ${{ secrets.OPENAI_KEY || secrets.QODO_API_KEY || secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
