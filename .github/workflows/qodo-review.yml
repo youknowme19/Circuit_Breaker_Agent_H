@@ -29,6 +29,8 @@ jobs:
         env:
           OPENAI__KEY: ${{ secrets.OPENAI_KEY || secrets.QODO_API_KEY || secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CONFIG__MODEL: "openai/gpt-4o-mini"
+          CONFIG__FALLBACK_MODELS: "['openai/gpt-3.5-turbo']"
           GITHUB_ACTION_CONFIG__AUTO_REVIEW: "true"
           GITHUB_ACTION_CONFIG__AUTO_IMPROVE: "true"
           GITHUB_ACTION_CONFIG__HANDLE_PUSH_TRIGGER: "true"
