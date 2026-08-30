@@ -128,7 +128,9 @@ npm --prefix frontend run dev
 
 ---
 
-## Security Invariants & Defense Matrix
+## Security Invariants & Attack Defense Matrix
+
+See comprehensive scenario breakdown in [docs/ATTACK_MATRIX.md](docs/ATTACK_MATRIX.md).
 
 | Attack Vector | Security Defense | Outcome |
 | :--- | :--- | :--- |
